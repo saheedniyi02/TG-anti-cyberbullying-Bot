@@ -50,8 +50,6 @@ jsonschema==4.6.0
 keyring==23.5.1
 lazy-object-proxy==1.6.0
 MarkupSafe==2.1.1
-matplotlib==3.4.3
-matplotlib-inline==0.1.3
 mccabe==0.6.1
 mistune==0.8.4
 nbclient==0.6.4
@@ -59,10 +57,8 @@ nbconvert==6.5.0
 nbformat==5.4.0
 nest-asyncio==1.5.5
 nltk==3.7
-numpy
 oauthlib==3.2.0
 packaging==21.0
-pandas==1.3.3
 pandocfilters==1.5.0
 pickleshare==0.7.5
 Pillow==8.4.0
@@ -70,7 +66,6 @@ plotly==5.9.0
 python-telegram-bot==20.4
 scikit-build==0.12.0
 scikit-learn==1.0
-scipy==1.7.1
 sqladmin==0.6.1
 SQLAlchemy==1.4.35
 sqlalchemy2-stubs==0.0.2a27
