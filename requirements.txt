@@ -1,4 +1,4 @@
-python-telegram-bot==20.4
+python-telegram-bot[webhooks]
 numpy
 scikit-learn
 sqladmin==0.6.1
