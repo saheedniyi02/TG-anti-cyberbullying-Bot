@@ -1,4 +1,5 @@
 import logging
+import pickle
 from datetime import datetime, timedelta
 from telegram import Update
 from telegram.ext import  filters, MessageHandler,ContextTypes,Application
@@ -13,6 +14,9 @@ db=[]
 #maximum number of spam_messages
 MAX_SPAM_MESSAGES=3
 NO_BANNED_DAYS=1
+model_path="assets/model.pickle" 
+vectorizer_path="assets/vectorizer.pickle"
+
 
 def add_to_db(user_id,chat_id):
 	for i,user_record in enumerate(db):
@@ -39,7 +43,11 @@ def reset_user_record(user_id,chat_id):
 	
 	
 def is_spam(text):
-	if "crazy" in text:
+	vectorizer = pickle.load(open(vectorizer_path,'rb'))
+	model = pickle.load(open(model_path,'rb'))
+	prediction=model.predict(vectorizer.transform([text]))[0]
+	print(prediction,text)
+	if prediction==1:
 		return True
 	return False
 
@@ -66,8 +74,6 @@ async def remove_spam(update: Update, context: ContextTypes.DEFAULT_TYPE):
    		
    		await context.bot.ban_chat_member(chat_id=chat_id,user_id=sender_id, revoke_messages=False, until_date=unban_date)
    		reset_user_record(sender_id,chat_id)
-   		
-   		
    	
    	else:
    		#send a message that the person has sent a spam message 
@@ -76,7 +82,7 @@ async def remove_spam(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 if __name__ == "__main__":
-    application = Application.builder().token("TOKEN").build()
+    application = Application.builder().token("5567082844:AAHW6G0jKHSB2pzdWN2S2Hc9w5lyTb0SdrY").build()
     spam_handler = MessageHandler(filters.TEXT & filters.ChatType.GROUPS , remove_spam)
     application.add_handler(spam_handler)
     application.run_polling()
