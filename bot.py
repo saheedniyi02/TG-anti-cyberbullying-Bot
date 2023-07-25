@@ -9,8 +9,6 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 
-#name: no of spam messages 
-db=[]
 
 #maximum number of spam_messages
 MAX_SPAM_MESSAGES=3
