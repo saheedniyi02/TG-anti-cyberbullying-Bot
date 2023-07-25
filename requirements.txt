@@ -1,5 +1,4 @@
 aiosmtplib==1.1.7
-android==1.0
 anyio==3.5.0
 APScheduler==3.9.1
 arabic-reshaper==2.1.3
