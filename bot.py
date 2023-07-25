@@ -2,8 +2,8 @@ import logging
 import pickle
 from datetime import datetime, timedelta
 from telegram import Update
-from telegram.ext import  filters, MessageHandler,ContextTypes,Application
-
+from telegram.ext import filters, MessageHandler,CommandHandler, ContextTypes,Application
+from database import add_to_db, has_hit_limit, reset_user_record,MAX_SPAM_MESSAGES
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
@@ -16,43 +16,23 @@ MAX_SPAM_MESSAGES=3
 NO_BANNED_DAYS=1
 model_path="assets/model.pickle" 
 vectorizer_path="assets/vectorizer.pickle"
-
-
-def add_to_db(user_id,chat_id):
-	for i,user_record in enumerate(db):
-		if (user_record["user_id"]==user_id) and (user_record["chat_id"]==chat_id):
-			user_record["no_spam_messages"]+=1
-			db[i]=user_record
-			return
-	db.append({"user_id":user_id,"chat_id":chat_id,"no_spam_messages":1})
-	return 
-	
-def has_hit_limit(user_id,chat_id):
-	for user_record in db:
-		if (user_record["user_id"]==user_id) and (user_record["chat_id"]==chat_id):
-			if user_record["no_spam_messages"]==MAX_SPAM_MESSAGES:
-				return True
-			return False
-			
-def reset_user_record(user_id,chat_id):
-	for i,user_record in enumerate(db):
-		if (user_record["user_id"]==user_id) and (user_record["chat_id"]==chat_id):
-			user_record["no_spam_messages"]=0
-			db[i]=user_record
-			return
-	
 	
 def is_spam(text):
 	vectorizer = pickle.load(open(vectorizer_path,'rb'))
 	model = pickle.load(open(model_path,'rb'))
 	prediction=model.predict(vectorizer.transform([text]))[0]
-	print(prediction,text)
 	if prediction==1:
 		return True
 	return False
+	
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+	"""Give a simple explanation of what the bot does"""
+	await context.bot.send_message(
+        chat_id=update.effective_chat.id, text=f"This is a cyber bullying bot, I Will help you remove users who engage in cyber-bullying on your group chats\nHow to use?\n\nAdd me as an admin to your group chat and give me permission to remove users, send and delete messages.  \nUsers are given {MAX_SPAM_MESSAGES} opportunities, if a user has sent up to {MAX_SPAM_MESSAGES} messages he will be removed and banned for {NO_BANNED_DAYS} days!"
+    )
+	
 
 async def remove_spam(update: Update, context: ContextTypes.DEFAULT_TYPE):
-   print(db)
    chat_id=update.effective_chat.id
    message=update.message
    sender_id=message.from_user.id
@@ -70,10 +50,9 @@ async def remove_spam(update: Update, context: ContextTypes.DEFAULT_TYPE):
    		reset_user_record(sender_id,chat_id)
    		
    		#remove user 
-   		await context.bot.send_message(chat_id=update.effective_chat.id, text=f"The message you've sent is a spam, and you've exceeding the spam limit, you'll be banned from the group chat for {NO_BANNED_DAYS} days!!",reply_to_message_id=message.message_id)
+   		await context.bot.send_message(chat_id=update.effective_chat.id, text=f"The message you've sent is a spam, and you've exceeded the spam limit, you'll be banned from the group chat for {NO_BANNED_DAYS} days!!",reply_to_message_id=message.message_id)
    		
-   		await context.bot.ban_chat_member(chat_id=chat_id,user_id=sender_id, revoke_messages=False, until_date=unban_date)
-   		reset_user_record(sender_id,chat_id)
+   		await context.bot.ban_chat_member(chat_id=chat_id,user_id=sender_id, revoke_messages=True, until_date=unban_date)
    	
    	else:
    		#send a message that the person has sent a spam message 
@@ -82,7 +61,9 @@ async def remove_spam(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 if __name__ == "__main__":
-    application = Application.builder().token("5567082844:AAHW6G0jKHSB2pzdWN2S2Hc9w5lyTb0SdrY").build()
+    application = Application.builder().token("TOKEN").build()
+    start_handler = CommandHandler("start", start, filters=~filters.ChatType.GROUPS)
     spam_handler = MessageHandler(filters.TEXT & filters.ChatType.GROUPS , remove_spam)
+    application.add_handler(start_handler)
     application.add_handler(spam_handler)
     application.run_polling()

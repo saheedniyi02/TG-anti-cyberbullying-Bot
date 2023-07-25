@@ -1,5 +1,7 @@
 import sqlalchemy as db
 
+
+MAX_SPAM_MESSAGES=3
 #create an engine kn
 engine = db.create_engine('sqlite:///database.sqlite')
 #create a connection 
@@ -17,51 +19,35 @@ GroupMembers = db.Table('GroupMembers', metadata,
               
 metadata.create_all(engine)
 
-#Add  a single item
-query = db.insert(GroupMembers).values(user_id=4427, groupchat_id=125,no_spam=1)
-Result = conn.execute(query)
 
-#Add to a single row
-query = db.insert(GroupMembers).values(user_id=2, groupchat_id=12,no_spam=1)
-Result = conn.execute(query)
-
-#get all items in our db
-output = conn.execute(GroupMembers.select()).fetchall()
-print(output)
-
-#seaech for specific items 
-query = GroupMembers.select().where(GroupMembers.columns.user_id==4427)
-output = conn.execute(query)
-print(output.fetchone())
-
-query = GroupMembers.select().where(db.and_(GroupMembers.columns.user_id == 2, GroupMembers.columns.groupchat_id == 12))
-output = conn.execute(query)
-print("hi")
-result=output.fetchone()
-print(result)
-
-# Update item
-# Get previous value
-print(f"{result}: RESULT")
-no_spam = result.no_spam
-print(no_spam)
-
-query = GroupMembers.update().where(
-    db.and_(GroupMembers.columns.user_id == result.user_id, GroupMembers.columns.groupchat_id == result.groupchat_id)
-).values(no_spam=no_spam + 1)
-
-# Execute the update statement
-conn.execute(query)
-
-# Delete
-query = GroupMembers.delete().where(
-    db.and_(GroupMembers.columns.user_id == 4427, GroupMembers.columns.groupchat_id == 125)
-)
-
-# Execute the delete statement
-conn.execute(query)
-
-#get all items in our db
-output = conn.execute(GroupMembers.select()).fetchall()
-print(output)
-
+def add_to_db(user_id,groupchat_id):
+	#first check if the user_id and groupchat_id are in our database 
+	search_query = GroupMembers.select().where(db.and_(GroupMembers.columns.user_id == user_id, GroupMembers.columns.groupchat_id == groupchat_id))
+	output = conn.execute(search_query)
+	result=output.fetchone()
+	
+	if result:
+		#increase no_spam value by 1
+		no_spam = result.no_spam
+		update_query = GroupMembers.update().where( db.and_(GroupMembers.columns.user_id == result.user_id, GroupMembers.columns.groupchat_id == result.groupchat_id)).values(no_spam=no_spam + 1)
+		conn.execute(update_query)
+	else:
+		#add the user 
+		insert_query = db.insert(GroupMembers).values(user_id=user_id, groupchat_id=groupchat_id,no_spam=1)
+		conn.execute(insert_query)
+	
+def has_hit_limit(user_id,groupchat_id):
+	""" check if the user has hit the spam limit for that group chat """
+	#search for user
+	search_query = GroupMembers.select().where(db.and_(GroupMembers.columns.user_id == user_id, GroupMembers.columns.groupchat_id == groupchat_id))
+	output = conn.execute(search_query)
+	result=output.fetchone()
+	if result:
+		if result.no_spam>=MAX_SPAM_MESSAGES:
+			return True
+	return False 
+	
+def reset_user_record(user_id,groupchat_id):
+	update_query = GroupMembers.update().where( db.and_(GroupMembers.columns.user_id == user_id, GroupMembers.columns.groupchat_id == groupchat_id)).values(no_spam=0)
+	conn.execute(update_query)
+	
