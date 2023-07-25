@@ -1,5 +1,6 @@
 import logging
 import pickle
+import os
 from datetime import datetime, timedelta
 from telegram import Update
 from telegram.ext import filters, MessageHandler,CommandHandler, ContextTypes,Application
@@ -13,6 +14,8 @@ logging.basicConfig(
 #maximum number of spam_messages
 MAX_SPAM_MESSAGES=3
 NO_BANNED_DAYS=1
+PORT = int(os.environ.get('PORT', 5000))
+TOKEN=os.environ.get("TOKEN")
 model_path="assets/model.pickle" 
 vectorizer_path="assets/vectorizer.pickle"
 	
@@ -61,10 +64,13 @@ async def remove_spam(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 if __name__ == "__main__":
-    application = Application.builder().token("TOKEN").build()
+    application = Application.builder().token(TOKEN).build()
     
     start_handler = CommandHandler("start", start, filters=~filters.ChatType.GROUPS)
     spam_handler = MessageHandler(filters.TEXT & filters.ChatType.GROUPS , remove_spam)
     application.add_handler(start_handler)
     application.add_handler(spam_handler)
-    application.run_polling()
+    application.start_webhook(listen="0.0.0.0",
+                          port=int(PORT),
+                          url_path=TOKEN)
+    application.bot.setWebhook('https://anti-cyberbullying-bot-7fc5d0ab71fc.herokuapp.com/' + TOKEN)
