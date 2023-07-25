@@ -3,6 +3,7 @@ import pickle
 from datetime import datetime, timedelta
 from telegram import Update
 from telegram.ext import filters, MessageHandler,CommandHandler, ContextTypes,Application
+from model import clean_text
 from database import add_to_db, has_hit_limit, reset_user_record,MAX_SPAM_MESSAGES
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -20,6 +21,7 @@ vectorizer_path="assets/vectorizer.pickle"
 def is_spam(text):
 	vectorizer = pickle.load(open(vectorizer_path,'rb'))
 	model = pickle.load(open(model_path,'rb'))
+	text=clean_text(text)
 	prediction=model.predict(vectorizer.transform([text]))[0]
 	if prediction==1:
 		return True
@@ -62,6 +64,7 @@ async def remove_spam(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 if __name__ == "__main__":
     application = Application.builder().token("TOKEN").build()
+    
     start_handler = CommandHandler("start", start, filters=~filters.ChatType.GROUPS)
     spam_handler = MessageHandler(filters.TEXT & filters.ChatType.GROUPS , remove_spam)
     application.add_handler(start_handler)
