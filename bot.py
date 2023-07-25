@@ -70,7 +70,7 @@ if __name__ == "__main__":
     spam_handler = MessageHandler(filters.TEXT & filters.ChatType.GROUPS , remove_spam)
     application.add_handler(start_handler)
     application.add_handler(spam_handler)
-    application.start_webhook(listen="0.0.0.0",
+    application.run_webhook(listen="0.0.0.0",
                           port=int(PORT),
                           url_path=TOKEN)
     application.bot.setWebhook('https://anti-cyberbullying-bot-7fc5d0ab71fc.herokuapp.com/' + TOKEN)
