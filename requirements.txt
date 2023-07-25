@@ -1,6 +1,6 @@
 python-telegram-bot==20.4
 numpy
-scikit-learn==1.0
+scikit-learn
 sqladmin==0.6.1
 SQLAlchemy==1.4.35
 sqlalchemy2-stubs==0.0.2a27
