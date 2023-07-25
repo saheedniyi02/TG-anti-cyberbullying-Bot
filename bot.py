@@ -72,5 +72,5 @@ if __name__ == "__main__":
     application.add_handler(spam_handler)
     application.run_webhook(listen="0.0.0.0",
                           port=int(PORT),
-                          url_path=TOKEN)
-    application.bot.setWebhook('https://anti-cyberbullying-bot-7fc5d0ab71fc.herokuapp.com/' + TOKEN)
+                          url_path=TOKEN,webhook_url='https://anti-cyberbullying-bot-7fc5d0ab71fc.herokuapp.com/' + TOKEN)
+   
