@@ -6,4 +6,4 @@ SQLAlchemy==1.4.35
 sqlalchemy2-stubs==0.0.2a27
 sqlmodel==0.0.8
 nltk
-
+pandas
