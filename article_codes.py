@@ -1,19 +1,20 @@
 #import the necessary packages
-import logging
-from datetime import datetime, timedelta
 from telegram import Update
 from telegram.ext import  filters, CommandHandler, MessageHandler,ContextTypes,Application
 
-TOKEN="TOKEN"
-MAX_BULLYING_MESSAGES=3
-NO_BANNED_DAYS=3
+TOKEN=""
 
-#a list of dictionaries in format {"user_id": 1, "chat_id"1:,"no_bullying":0}
-db=[]
-
+#logging
+import logging
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
+
+
+#stsrt command
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+	"""Give a simple explanation of what the bot does"""
+	await context.bot.send_message( chat_id=update.effective_chat.id, text=f"This is a cyber bullying bot, I Will help you remove users who engage in cyber-bullying on your group chats")
 
 
 def is_cyberbullying(text):
@@ -21,6 +22,14 @@ def is_cyberbullying(text):
 		return True
 	return False
 	
+#a list of dictionaries in format {"user_id": 1, "chat_id"1:,"no_bullying":0}
+db=[]
+
+#maximum number of bullying_messages
+MAX_BULLYING_MESSAGES=3
+NO_BANNED_DAYS=3
+
+
 def add_to_db(user_id,chat_id):
 	#search for the user record in the group chat 
 	for i,user_record in enumerate(db):
@@ -46,14 +55,10 @@ def reset_user_record(user_id,chat_id):
 			user_record["no_bullying"]=0
 			db[i]=user_record
 			return
+
 			
-#stsrt command
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-	"""Give a simple explanation of what the bot does"""
-	await context.bot.send_message(
-        chat_id=update.effective_chat.id, text=f"This is a cyber bullying bot, I Will help you remove users who engage in cyber-bullying on your group chats\nHow to use?\n\nAdd me as an admin to your group chat and give me permission to remove users, send and delete messages.  \nUsers are given {MAX_BULLYING_MESSAGES} opportunities, if a user has sent up to {MAX_BULLYING_MESSAGES} messages the user will be removed and banned for {NO_BANNED_DAYS} days!"
-    )
-	
+from datetime import datetime, timedelta
+			
 #cyberbullying handler
 async def remove_cyberbullying(update: Update, context: ContextTypes.DEFAULT_TYPE):
    chat_id=update.effective_chat.id
