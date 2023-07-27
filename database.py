@@ -1,7 +1,6 @@
 import sqlalchemy as db
 
 
-MAX_SPAM_MESSAGES=3
 #create an engine kn
 engine = db.create_engine('sqlite:///database.sqlite')
 #create a connection 
@@ -19,7 +18,7 @@ GroupMembers = db.Table('GroupMembers', metadata,
               
 metadata.create_all(engine)
 
-MAX_SPAM_MESSAGES=3
+MAX_BULLYING_MESSAGES=3
 def add_to_db(user_id,groupchat_id):
 	#first check if the user_id and groupchat_id are in our database 
 	search_query = GroupMembers.select().where(db.and_(GroupMembers.columns.user_id == user_id, GroupMembers.columns.groupchat_id == groupchat_id))
@@ -37,13 +36,13 @@ def add_to_db(user_id,groupchat_id):
 		conn.execute(insert_query)
 	
 def has_hit_limit(user_id,groupchat_id):
-	""" check if the user has hit the cyberbullying limit for that group chat """
+	""" check if the user has hit the spam limit for that group chat """
 	#search for user
 	search_query = GroupMembers.select().where(db.and_(GroupMembers.columns.user_id == user_id, GroupMembers.columns.groupchat_id == groupchat_id))
 	output = conn.execute(search_query)
 	result=output.fetchone()
 	if result:
-		if result.no_bullying>=MAX_SPAM_MESSAGES:
+		if result.no_bullying>=MAX_BULLYING_MESSAGES:
 			return True
 	return False 
 	
