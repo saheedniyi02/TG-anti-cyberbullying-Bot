@@ -2,7 +2,7 @@
 from telegram import Update
 from telegram.ext import  filters, CommandHandler, MessageHandler,ContextTypes,Application
 
-TOKEN=""
+TOKEN="TOKEN"
 
 #logging
 import logging
@@ -17,8 +17,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 	await context.bot.send_message( chat_id=update.effective_chat.id, text=f"This is a cyber bullying bot, I Will help you remove users who engage in cyber-bullying on your group chats")
 
 
+#import the clean_text function from the model.py file (since you'll want to do the same data cleaning you did on the train data on the texts).
+from model import clean_text
+
 def is_cyberbullying(text):
-	if "fool" in text:
+	#read the saved vectorizers and models 
+	vectorizer = pickle.load(open(vectorizer_path,'rb'))
+	model = pickle.load(open(model_path,'rb'))
+	#clean the text
+	text=clean_text(text)
+	#convert the text to vector and make predictions 
+	prediction=model.predict(vectorizer.transform([text]))[0]
+	if prediction==1:
 		return True
 	return False
 	
@@ -85,6 +95,7 @@ async def remove_cyberbullying(update: Update, context: ContextTypes.DEFAULT_TYP
    	else:
    		#send a message that the person has sent an abusive message 
    		await context.bot.send_message(chat_id=update.effective_chat.id, text="The message you've sent is a abusive, be careful or you'll be removed from the group chat soon!",reply_to_message_id=message.message_id)
+
 
 		
 
