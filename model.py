@@ -121,6 +121,7 @@ def train_model(X,val,y,y_val):
 	return model, vectorizer
 	
 if __name__ == "__main__":
+	#clean the data and train the model only when this file is run directly.
 	X, val, y, y_val=clean_data()
 	model,vectorizer=train_model(X,val,y,y_val)
 	model_path="assets/model.pickle" 
