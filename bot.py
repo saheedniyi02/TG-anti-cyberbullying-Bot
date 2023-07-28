@@ -32,7 +32,7 @@ def is_cyberbullying(text):
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 	"""Give a simple explanation of what the bot does"""
 	await context.bot.send_message(
-        chat_id=update.effective_chat.id, text=f"This is a cyber bullying bot, I Will help you remove users who engage in cyber-bullying on your group chats\nHow to use?\n\nAdd me as an admin to your group chat and give me permission to remove users, send and delete messages.  \nUsers are given {MAX_BULLYING_MESSAGES} opportunities, if a user has sent up to {MAX_BULLYING_MESSAGES} messages the user will be removed and banned for {NO_BANNED_DAYS} days!"
+        chat_id=update.effective_chat.id, text=f"This is a cyber bullying bot, I Will help you remove users who engage in cyber-bullying on your group chats\nHow to use?\n\nAdd me as an admin to your group chat and give me permission to remove users, send and delete messages.  \nUsers are given {MAX_BULLYING_MESSAGES} opportunities, if a user has sent up to {MAX_BULLYING_MESSAGES} messages recognized as cyberbullying, the user will be removed and banned for {NO_BANNED_DAYS} days!"
     )
 	
 #cyberbullying handler
