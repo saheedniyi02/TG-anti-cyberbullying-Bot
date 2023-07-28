@@ -10,7 +10,7 @@ from database import add_to_db, has_hit_limit, reset_user_record,MAX_BULLYING_ME
 
 #maximum number of bullying_messages
 NO_BANNED_DAYS=3
-TOKEN="6451988549:AAEUZcBAoypSIoGmvG6po8q2T6p8ZO-_T2A"
+TOKEN="YOUR BOT TOKEN"
 model_path="assets/model.pickle" 
 vectorizer_path="assets/vectorizer.pickle"
 
